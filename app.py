@@ -18,8 +18,8 @@ db = SQLAlchemy(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your_email@gmail.com'  # Replace with your email
-app.config['MAIL_PASSWORD'] = 'your_app_password'     # Replace with your app-specific password
+app.config['MAIL_USERNAME'] = 'mssk6304445254@gmail.com'  # Replace with your email
+app.config['MAIL_PASSWORD'] = 'aqmu apxs ezsp dvel'     # Replace with your app-specific password
 
 mail = Mail(app)
 s = URLSafeTimedSerializer(app.secret_key)
