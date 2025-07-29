@@ -1,45 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-
-        h2 {
-            color: #333;
-        }
-
-        .nav-buttons {
-            margin-top: 20px;
-        }
-
-        .nav-buttons a {
-            display: inline-block;
-            margin-right: 15px;
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.2s;
-        }
-
-        .nav-buttons a:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-    <h2>Welcome, {{ user.username }}!</h2>
-    <p>You are now logged in.</p>
-    
-    <div class="nav-buttons">
-        <a href="/logout">Logout</a>
-        <a href="/forgot">Forgot Password</a>
+    <div class="dashboard">
+        <div class="navbar">
+            <h2>Welcome, {{ user.username }}!</h2>
+            <a href="/logout">Logout</a>
+        </div>
+
+        <div class="container">
+            <p>You are now logged in.</p>
+        </div>
     </div>
 </body>
 </html>
+
