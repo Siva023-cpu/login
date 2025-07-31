@@ -15,6 +15,6 @@ Features:
 ---------
 - Register / Login
 - Password hashed using SHA-256
-- SQLite Database auto-created
+- postgreSQL Database
 - Session-based login with dashboard
 - Logout
