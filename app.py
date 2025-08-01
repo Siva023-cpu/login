@@ -3,15 +3,22 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask_mail import Mail, Message
+from dotenv import load_dotenv
 import os
+
+
 
 app = Flask(__name__)
 app.secret_key = 'secretkey'  # CHANGE in production
 
-# Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# Database (PostgreSQL via .env)
+load_dotenv()
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+
 
 # Email
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -25,11 +32,14 @@ s = URLSafeTimedSerializer(app.secret_key)
 
 # User Model
 class User(db.Model):
+    __tablename__ = 'users'  # <-- this fixes naming issue
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     verified = db.Column(db.Boolean, default=False)
+
+
 
 # Routes
 @app.route('/')
