@@ -26,10 +26,11 @@ pipeline {
             steps {
                 bat """
                 call venv\\Scripts\\activate
-                bandit -r . -f json -o bandit-report.json || true
+                bandit -r . -f json -o bandit-report.json || exit /b 0
                 """
             }
         }
+
 
 
         stage('Test') {
