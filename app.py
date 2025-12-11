@@ -149,8 +149,9 @@ def reset_password(token):
     return render_template('reset.html')
 
 if __name__ == "__main__":
+    
     with app.app_context():
-    db.create_all()
+        db.create_all()
 
     import os
     port = int(os.environ.get("PORT", 5000))
