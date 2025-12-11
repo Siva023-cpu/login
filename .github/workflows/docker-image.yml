@@ -25,4 +25,7 @@ jobs:
 
       - name: Push Docker image
         run: docker push vasgrills/flask-login-app:latest
+      - name: Trigger Render Deployment
+        run: curl -X POST "https://api.render.com/deploy/srv-xxxxx?key=YYYYY"
+
 
