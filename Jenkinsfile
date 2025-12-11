@@ -29,10 +29,11 @@ pipeline {
             steps {
                 bat '''
                 call venv\\Scripts\\activate
-                bandit -r . -f json -o bandit-report.json || echo "Bandit found issues but continuing pipeline"
+                bandit -r . -f json -o bandit-report.json || echo "Bandit scan completed with warnings, continuing..."
                 '''
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
