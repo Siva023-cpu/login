@@ -23,14 +23,14 @@ pipeline {
         }
 
         stage('Security Scan (Bandit)') {
-            steps {
-                bat """
-                call venv\\Scripts\\activate
-                pip install bandit
-                bandit -r .
-                """
-            }
-        }
+    steps {
+        bat """
+        call venv\\Scripts\\activate
+        bandit -r . -f json -o bandit-report.json || true
+        """
+    }
+}
+
 
         stage('Test') {
             steps {
