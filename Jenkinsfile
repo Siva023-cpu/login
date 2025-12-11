@@ -29,17 +29,20 @@ pipeline {
             steps {
                 bat '''
                 call venv\\Scripts\\activate
-                bandit -r . -f json -o bandit-report.json || echo "Bandit scan completed with warnings, continuing..."
+                bandit -r . -f json -o bandit-report.json
+                IF %ERRORLEVEL% NEQ 0 (
+                    echo "Bandit found issues but continuing..."
+                    exit /b 0
+                )
                 '''
             }
         }
 
-
         stage('Build Docker Image') {
             steps {
-                bat """
+                bat '''
                 docker build -t %DOCKERHUB_USER%/%IMAGE_NAME%:latest .
-                """
+                '''
             }
         }
 
@@ -50,29 +53,30 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    bat """
+                    bat '''
                     echo %PASS% | docker login -u %USER% --password-stdin
-                    """
+                    '''
                 }
             }
         }
 
         stage('Push Image to Docker Hub') {
             steps {
-                bat """
+                bat '''
                 docker push %DOCKERHUB_USER%/%IMAGE_NAME%:latest
-                """
+                '''
             }
         }
 
         stage('Deploy Container') {
             steps {
-                bat """
-                docker rm -f flask-dev || echo already removed
+                bat '''
+                docker rm -f flask-dev || echo Container already removed
                 docker run -d -p 5000:5000 --name flask-dev %DOCKERHUB_USER%/%IMAGE_NAME%:latest
-                """
+                '''
             }
         }
     }
 }
+
 
