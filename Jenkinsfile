@@ -1,13 +1,15 @@
-
 pipeline {
     agent any
 
-    stages {
+    environment {
+        FLASK_APP = 'app.py'
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+    }
 
+    stages {
         stage('Checkout') {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/Siva023-cpu/login.git'
+                git 'https://github.com/Siva023-cpu/login.git'
             }
         }
 
@@ -16,7 +18,6 @@ pipeline {
                 bat """
                 python -m venv venv
                 call venv\\Scripts\\activate
-                pip install --upgrade pip
                 pip install -r requirements.txt
                 """
             }
@@ -31,13 +32,9 @@ pipeline {
             }
         }
 
-
-
         stage('Test') {
             steps {
-                bat """
-                echo Running tests...
-                """
+                bat "echo Running tests..."
             }
         }
 
@@ -45,8 +42,7 @@ pipeline {
             steps {
                 bat """
                 call venv\\Scripts\\activate
-                set FLASK_APP=app.py
-                flask run
+                flask run --host=0.0.0.0 --port=5000
                 """
             }
         }
