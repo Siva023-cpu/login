@@ -17,6 +17,10 @@ load_dotenv()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+# Create DB tables at startup (works in Jenkins too)
+with app.app_context():
+    db.create_all()
+
 
 
 
