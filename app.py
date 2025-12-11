@@ -151,6 +151,10 @@ def reset_password(token):
             return '✅ Your password has been updated. <a href="/login">Login</a>'
         return 'User not found.'
     return render_template('reset.html')
+    # Create all DB tables if they do not exist
+with app.app_context():
+    db.create_all()
+
 
 if __name__ == "__main__":
     
