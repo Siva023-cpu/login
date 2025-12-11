@@ -2,49 +2,76 @@ pipeline {
     agent any
 
     environment {
-        FLASK_APP = 'app.py'
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+        DOCKERHUB_USER = "vasgrills"
+        IMAGE_NAME = "flask-login-app"
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Code') {
             steps {
-                git 'https://github.com/Siva023-cpu/login.git'
+                git branch: 'master',
+                    url: 'https://github.com/Siva023-cpu/login.git'
             }
         }
 
-        stage('Setup Python Env') {
+        stage('Install Dependencies') {
             steps {
-                bat """
+                bat '''
                 python -m venv venv
                 call venv\\Scripts\\activate
                 pip install -r requirements.txt
-                """
+                '''
             }
         }
 
         stage('Security Scan (Bandit)') {
             steps {
-                bat """
+                bat '''
                 call venv\\Scripts\\activate
-                bandit -r . -f json -o bandit-report.json || exit /b 0
+                bandit -r . -f json -o bandit-report.json
+                '''
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat """
+                docker build -t %DOCKERHUB_USER%/%IMAGE_NAME%:latest .
                 """
             }
         }
 
-        stage('Test') {
+        stage('Login to Docker Hub') {
             steps {
-                bat "echo Running tests..."
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    bat """
+                    echo %PASS% | docker login -u %USER% --password-stdin
+                    """
+                }
             }
         }
 
-        stage('Run Flask App') {
+        stage('Push Image to Docker Hub') {
             steps {
                 bat """
-                call venv\\Scripts\\activate
-                flask run --host=0.0.0.0 --port=5000
+                docker push %DOCKERHUB_USER%/%IMAGE_NAME%:latest
+                """
+            }
+        }
+
+        stage('Deploy Container') {
+            steps {
+                bat """
+                docker rm -f flask-dev || echo already removed
+                docker run -d -p 5000:5000 --name flask-dev %DOCKERHUB_USER%/%IMAGE_NAME%:latest
                 """
             }
         }
     }
 }
+
