@@ -73,7 +73,7 @@ def register():
         msg.body = f'Click the link to verify your email: {link}'
         #mail.send(msg)
 
-        return 'A confirmation link has been sent to your email.'
+        return 'registered succesfully'
     return render_template('register.html')
 
 @app.route('/confirm/<token>')
