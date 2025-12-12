@@ -71,7 +71,7 @@ def register():
 
         msg = Message('Confirm Your Email', sender='mssk6304445254@gmail.com', recipients=[email])
         msg.body = f'Click the link to verify your email: {link}'
-        mail.send(msg)
+        #mail.send(msg)
 
         return 'A confirmation link has been sent to your email.'
     return render_template('register.html')
