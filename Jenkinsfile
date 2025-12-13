@@ -17,9 +17,10 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                bat '''
-                python -m venv venv
-                call venv\\Scripts\\activate
+                sh '''
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
             }
@@ -27,21 +28,18 @@ pipeline {
 
         stage('Security Scan (Bandit)') {
             steps {
-                bat '''
-                call venv\\Scripts\\activate
-                bandit -r . -f json -o bandit-report.json
-                IF %ERRORLEVEL% NEQ 0 (
-                    echo "Bandit found issues but continuing..."
-                    exit /b 0
-                )
+                sh '''
+                . venv/bin/activate
+                pip install bandit
+                bandit -r . -f json -o bandit-report.json || true
                 '''
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat '''
-                docker build -t %DOCKERHUB_USER%/%IMAGE_NAME%:latest .
+                sh '''
+                docker build -t ${DOCKERHUB_USER}/${IMAGE_NAME}:latest .
                 '''
             }
         }
@@ -53,8 +51,8 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    bat '''
-                    echo %PASS% | docker login -u %USER% --password-stdin
+                    sh '''
+                    echo "$PASS" | docker login -u "$USER" --password-stdin
                     '''
                 }
             }
@@ -62,20 +60,23 @@ pipeline {
 
         stage('Push Image to Docker Hub') {
             steps {
-                bat '''
-                docker push %DOCKERHUB_USER%/%IMAGE_NAME%:latest
+                sh '''
+                docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:latest
                 '''
             }
         }
 
         stage('Deploy Container') {
             steps {
-                bat '''
-                docker rm -f flask-dev || echo Container already removed
-                docker run -d -p 5000:5000 --name flask-dev %DOCKERHUB_USER%/%IMAGE_NAME%:latest
+                sh '''
+                docker rm -f flask-dev || true
+                docker run -d -p 5000:5000 --name flask-dev ${DOCKERHUB_USER}/${IMAGE_NAME}:latest
                 '''
             }
         }
+    }
+}
+
     }
 }
 
