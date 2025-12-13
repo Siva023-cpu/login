@@ -30,7 +30,6 @@ pipeline {
             steps {
                 sh '''
                 . venv/bin/activate
-                pip install bandit
                 bandit -r . -f json -o bandit-report.json || true
                 '''
             }
@@ -39,7 +38,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                docker build -t ${DOCKERHUB_USER}/${IMAGE_NAME}:latest .
+                docker build -t $DOCKERHUB_USER/$IMAGE_NAME:latest .
                 '''
             }
         }
@@ -61,7 +60,7 @@ pipeline {
         stage('Push Image to Docker Hub') {
             steps {
                 sh '''
-                docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:latest
+                docker push $DOCKERHUB_USER/$IMAGE_NAME:latest
                 '''
             }
         }
@@ -70,14 +69,9 @@ pipeline {
             steps {
                 sh '''
                 docker rm -f flask-dev || true
-                docker run -d -p 5000:5000 --name flask-dev ${DOCKERHUB_USER}/${IMAGE_NAME}:latest
+                docker run -d -p 5000:5000 --name flask-dev $DOCKERHUB_USER/$IMAGE_NAME:latest
                 '''
             }
         }
     }
 }
-
-    }
-}
-
-
